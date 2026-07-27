@@ -73,6 +73,23 @@ It contains **no application code** — implementation begins in Phase 2.
 | 16 | **Version Roadmap** | V1 personal tool · V2 automation · V3 SaaS, with hard entry conditions and what must never be deferred |
 | 17 | Reconciliation | Seven refinements to Phase 1B, recorded explicitly |
 
+### 📕 [Phase 1D — Implementation Plan](docs/PHASE-1D-implementation-plan.md)
+
+**Read fourth.** How the design becomes working software — the build plan for **V1, the personal tool**.
+
+| § | Section | Contents |
+|---|---|---|
+| 1–2 | Build philosophy & dependency graph | Five sequencing principles, what can parallelise, the critical path |
+| 3 | Milestone overview | Eleven milestones, 21.5 weeks, with demos |
+| 4 | **Milestone 0 — Thesis validation** | One week, no production code, proving the analysis produces non-obvious findings **before** building the machine |
+| 5 | Milestone 1 — Walking skeleton | Every architectural seam exercised, all providers faked, offline and free |
+| 6–8 | Data, visual analysis, **analysis engines** | The core value, with a checkpoint that re-runs the M0 test at production quality |
+| 9–11 | Concepts, legal gate, artwork | Including the service-layer bypass test and the induced-misspelling test |
+| 12–14 | Commerce, publishing, tracking | Including zero-duplicate chaos testing |
+| 15–16 | Local setup & testing gates | One command to a working system with realistic data |
+| 17 | Estimates | 106–146 person-days; 27.5 weeks with buffer |
+| 18 | Risk register | Early warning signals, four go/no-go checkpoints, what to cut and what never to cut |
+
 ---
 
 ## What the product does
@@ -168,5 +185,5 @@ The `docs/` directory also contains earlier and more granular technical drafts. 
 | **1A** | **Product Definition** | ✅ **Complete — ready for review** |
 | **1B** | **Technical Architecture** | ✅ **Complete — ready for review** |
 | **1C** | **AI Systems & Integrations** | ✅ **Complete — ready for review** |
-| 2 | Implementation — foundation and orchestration | Not started |
-| 3 | Implementation — intelligence, creative, commerce, feedback | Not started |
+| **1D** | **Implementation Plan** | ✅ **Complete — ready for review** |
+| 2 | Implementation — V1 personal tool | Not started — begins at Milestone 0 |
