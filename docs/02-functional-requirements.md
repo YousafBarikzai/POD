@@ -144,7 +144,7 @@ Convention:
 | FR-504 | MUST | Produce two paired outputs: **"Success Factors"** and **"Avoid These Factors"**, with an explicit conflict-resolution rule when an attribute appears in both (report net lift and mark as `ambiguous`). |
 | FR-505 | MUST | Distinguish **causal-plausible** anti-factors (e.g. one image, no tags) from **correlational-only** ones, and label them. The UI must not imply causation where none is established. |
 | FR-506 | SHOULD | Identify "crowded loser" patterns — attribute combinations that are simultaneously very common and heavily represented in the failure cohort (i.e. what everyone does that doesn't work). |
-| FR-507 | MUST | Feed anti-factors into the concept generator as **negative constraints** and into the Design Success Predictor as penalty terms. |
+| FR-507 | MUST | Feed anti-factors into the concept generator as **negative constraints** and into the Opportunity Scoring Engine as penalty terms. |
 
 ---
 
@@ -165,7 +165,7 @@ Convention:
 
 ---
 
-## FR-700 — Step 7: Design Success Predictor
+## FR-700 — Step 7: Opportunity Scoring Engine
 
 | ID | Req | Detail |
 |---|---|---|
@@ -175,7 +175,7 @@ Convention:
 | FR-704 | MUST | **Conversion** = model of expected click-through and purchase propensity from attributes empirically associated with conversion (image count plan, mockup style, price band, title structure, personalisation). Starts as an expert-weighted linear model; replaced by a fitted model once ≥ 200 outcomes exist (FR-1610). |
 | FR-705 | MUST | **Competition** = inverse density of directly comparable competitor listings (same sub-niche, same angle, similar style), normalised. |
 | FR-706 | MUST | **Opportunity** = the Gap Opportunity Score of the cell this concept occupies, or the sub-niche opportunity score if it is not a gap play. |
-| FR-707 | MUST | **Design Success Score** = weighted combination (default: Market Fit 0.30, Conversion 0.25, Opportunity 0.20, Originality 0.15, Competition 0.10), 0–100, with band mapping (`weak` <40, `moderate` 40–59, `promising` 60–74, `strong` 75–87, `exceptional` ≥88). |
+| FR-707 | MUST | **Opportunity Score** = weighted combination (default: Market Fit 0.30, Conversion 0.25, Opportunity 0.20, Originality 0.15, Competition 0.10), 0–100, with band mapping (`weak` <40, `moderate` 40–59, `promising` 60–74, `strong` 75–87, `exceptional` ≥88). |
 | FR-708 | MUST | Provide **reasoning** per dimension: which factors contributed positively and negatively, with their weights. The reasoning is generated from the computed contribution vector, not free-form LLM narrative. |
 | FR-709 | MUST | Persist all sub-scores, the contribution vector, the config version, and the feature snapshot, so predictions can be back-tested. |
 | FR-710 | MUST | Re-score artwork after generation (originality and conversion change once the image exists) and store both `predicted_at_concept` and `predicted_at_artwork` values. |
@@ -337,7 +337,7 @@ Convention:
 
 | ID | Req | Detail |
 |---|---|---|
-| FR-1501 | MUST | A single review screen showing: concept summary, artwork (with transparency proof), all mockups, product configuration and variants, pricing table, profit estimate per unit and per variant, full SEO variation selected, legal screening status, and the Design Success Score. |
+| FR-1501 | MUST | A single review screen showing: concept summary, artwork (with transparency proof), all mockups, product configuration and variants, pricing table, profit estimate per unit and per variant, full SEO variation selected, legal screening status, and the Opportunity Score. |
 | FR-1502 | MUST | Display a **pre-publish checklist** with pass/fail: legal cleared, artwork QA passed, margin ≥ floor, tags = 13, title ≤ 140, ≥ N images, shipping profile set, taxonomy set, originality check passed. Publish is disabled until all hard checks pass. |
 | FR-1503 | MUST | The profit estimate **MUST** itemise: retail price, Printify cost, Etsy listing fee, transaction fee, payment processing, offsite ads (worst case), shipping, VAT, and net profit with margin %. |
 | FR-1504 | MUST | Publishing requires an explicit confirm dialog restating what will happen and to which shop. |

@@ -96,7 +96,7 @@
 ## 4. Phase 3 — Creative Core (4 weeks)
 
 ### Sprint 3.1 — Predictor + Concepts (week 9)
-- Design Success Predictor: five dimensions, contribution vectors, reasoning rendering, banding.
+- Opportunity Scoring Engine: five dimensions, contribution vectors, reasoning rendering, banding.
 - Concept engine: 10 success-derived + 10 gap-derived, structured output, embedding dedupe within-run and against history, quota refill.
 - Concept board UI with selection, regeneration, manual entry, expansion.
 - Groundedness eval: every cited factor/gap must exist and match its stored statistic (gate: 100%).

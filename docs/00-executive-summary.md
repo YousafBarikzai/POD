@@ -32,7 +32,7 @@ The information needed to do better *already exists in public and semi-public da
 3. **Reads the market *visually*** — palette extraction, typography classification, layout archetype detection and mockup-style tagging on competitor thumbnails, turning aesthetics into statistics.
 4. **Separates signal from noise** — a Success Analysis Engine and a Failure Analysis Engine producing weighted, statistically-qualified factor lists ("84% of top-decile listings use muted green palettes; 91% use 8+ images") *and* the anti-patterns ("62% of bottom-decile listings price below £14.50 with paid shipping").
 5. **Finds the white space** — a Market Gap Engine that maps sub-niche coverage against sub-niche demand and ranks the underserved intersections.
-6. **Generates original concepts, not copies** — 10 concepts derived from success factors and 10 derived from market gaps, each with audience, style, reasoning and a predicted Design Success Score before a single pixel is rendered.
+6. **Generates original concepts, not copies** — 10 concepts derived from success factors and 10 derived from market gaps, each with audience, style, reasoning and a estimated Opportunity Score before a single pixel is rendered.
 7. **Screens for legal risk before generation** — trademark, copyright, and Etsy-policy screening as a hard gate, not an afterthought.
 8. **Produces print-ready artwork** — Ideogram-generated, background-removed, upscaled, DPI-validated, optionally vectorised, with a full print-readiness QA report.
 9. **Builds the listing** — product/blueprint recommendation, pricing with margin modelling, and 10 regenerable SEO listing variations (title, description, 13 tags, keyword rationale, positioning).
@@ -71,7 +71,7 @@ flowchart TB
         COMP[Competitor Engine]
         SUCC[Success / Failure Engines]
         GAP[Market Gap Engine]
-        PRED[Design Success Predictor]
+        PRED[Opportunity Scoring Engine]
         CONC[Concept Generator]
         LEGAL[Legal & Safety Engine]
         ART[Artwork Pipeline]

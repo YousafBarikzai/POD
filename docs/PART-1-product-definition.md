@@ -683,7 +683,7 @@ Primarily waiting, then reviewing.
    - **Conversion** — likelihood of turning views into purchases, based on attributes empirically associated with conversion.
    - **Competition** — how crowded this specific angle already is.
    - **Opportunity** — the size of the gap or sub-niche it addresses.
-5. Combines these into a single **Design Success Score** with a band (Weak / Moderate / Promising / Strong / Exceptional), and shows exactly which factors contributed positively and negatively.
+5. Combines these into a single **Opportunity Score** with a band (Weak / Moderate / Promising / Strong / Exceptional), and shows exactly which factors contributed positively and negatively.
 6. Removes near-duplicates within the set and flags anything closely resembling a concept the user has generated before, regenerating as needed to deliver a full set of twenty genuinely distinct ideas.
 
 **Crucially:** concept generation receives only aggregate statistics — palette families, typography classes, layout archetypes, price bands, gap descriptions. It never receives competitor listing text, titles or images. Originality is therefore structural: there is no path by which a competitor's specific design could influence what is created.
@@ -857,7 +857,7 @@ Ten complete, validated, differentiated listing variations, ranked by quality sc
 
 ### System actions
 Presents, on one page:
-- The concept summary and its Design Success Score.
+- The concept summary and its Opportunity Score.
 - The artwork, with a transparency proof.
 - All mockups in publish order, with the primary image indicated.
 - The product configuration and variant table.
@@ -957,7 +957,7 @@ A live listing with a link, a confirmed fulfilment linkage, and a permanent reco
 - Portfolio performance over time with markers showing when products were published.
 - Per-niche and per-sub-niche performance comparison.
 - **Comparison of success-derived concepts against gap-derived concepts** — a directly actionable finding about which strategy works better for this user.
-- Prediction accuracy: how well the Design Success Score actually predicted outcomes, shown as a calibration curve.
+- Prediction accuracy: how well the Opportunity Score actually predicted outcomes, shown as a calibration curve.
 - Cost analysis: spend per research run, per artwork, per published product, against budget.
 
 **Learning**
@@ -1155,7 +1155,7 @@ Requirements are grouped by capability. Each has an identifier, a priority (**Mu
 | ID | Priority | Requirement |
 |---|---|---|
 | FR-DP-01 | Must | Score every concept on Market Fit, Originality, Conversion, Competition and Opportunity |
-| FR-DP-02 | Must | Combine these into a single Design Success Score with a plain-language band |
+| FR-DP-02 | Must | Combine these into a single Opportunity Score with a plain-language band |
 | FR-DP-03 | Must | Show precisely which factors contributed positively and negatively to each dimension |
 | FR-DP-04 | Must | Base Market Fit on measured alignment with success factors, less alignment with failure factors |
 | FR-DP-05 | Must | Base Originality on measured distance from the existing market and from the user's own prior work |
@@ -1285,7 +1285,7 @@ Requirements are grouped by capability. Each has an identifier, a priority (**Mu
 | FR-AN-04 | Must | Compute derived measures including conversion rate, days to first sale, and age-adjusted performance percentile |
 | FR-AN-05 | Must | Provide portfolio and per-niche performance views |
 | FR-AN-06 | Must | Compare success-derived against gap-derived concepts |
-| FR-AN-07 | Must | Compare predicted Design Success Scores against actual outcomes |
+| FR-AN-07 | Must | Compare estimated Opportunity Scores against actual outcomes |
 | FR-AN-08 | Must | Report spending by activity and provider against budget |
 | FR-AN-09 | Must | **Provide full traceability** from any published listing back through product, artwork, concept, originating factor or gap, and research run — each step navigable |
 | FR-AN-10 | Must | Provide run history with filtering, re-running and comparison between runs of the same niche |
@@ -2269,7 +2269,7 @@ Ranked by how well they indicate real value.
 
 | Metric | Target | Meaning |
 |---|---|---|
-| **Prediction accuracy** | Meaningful positive correlation between Design Success Score and realised outcome after 100 published products | The scores are real, not decorative |
+| **Prediction accuracy** | Meaningful positive correlation between Opportunity Score and realised outcome after 100 published products | The scores are real, not decorative |
 | **Precision at the top** | Of the ten designs the system scored highest, at least five in the top quartile of outcomes | Practical usefulness of the ranking |
 | **Calibration improvement** | Measurably better after the first learning cycle | The loop works |
 | **Factor validation** | At least 60% of high-confidence success factors show predictive value in realised outcomes | The statistics reflect reality |

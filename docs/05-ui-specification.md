@@ -272,7 +272,7 @@ Mirrors the success page with inverted framing plus:
 
 **Header:** counts (10 success-derived / 10 gap-derived), sort control (any predictor sub-score), filters (origin, sub-niche, style, risk), Regenerate All (with cost), Add Manual Concept.
 
-**Grid:** `ConceptCard` — name · origin badge · `ScoreDial` (Design Success Score) · five mini sub-score bars · style tags · 2-line description · risk chip (once screened) · select checkbox · regenerate icon.
+**Grid:** `ConceptCard` — name · origin badge · `ScoreDial` (Opportunity Score) · five mini sub-score bars · style tags · 2-line description · risk chip (once screened) · select checkbox · regenerate icon.
 
 **Selection bar (sticky bottom):** "4 concepts selected · Est. artwork cost £0.24 · Continue to legal screening →".
 
@@ -283,7 +283,7 @@ Mirrors the success page with inverted framing plus:
 ### 3.10 `/concepts/[conceptId]` — Concept Detail & Legal
 
 **Left:** concept content, editable where manual.
-**Right top:** Design Success Predictor — five `ScoreBreakdown` rows with contribution waterfalls showing exactly which factors added and subtracted points.
+**Right top:** Opportunity Scoring Engine — five `ScoreBreakdown` rows with contribution waterfalls showing exactly which factors added and subtracted points.
 **Right bottom:** Legal & Safety panel — overall `RiskChip`, extracted entities, per-registry results table (mark, owner, registration number, class, jurisdiction, status, link), copyright risk assessment, rationale, and the disclaimer.
 
 **Actions by risk level:** `none`/`low` → "Generate artwork"; `medium` → acknowledgement checkbox then generate; `high` → typed confirmation ("I understand the risk") + free-text justification, recorded; `blocked` → generation disabled, with safer alternatives presented as accept-and-replace cards.
@@ -328,7 +328,7 @@ Tabbed, with a persistent right rail showing the running profit estimate and the
 
 Single scrollable page, print-friendly.
 
-1. **Header:** product name, Design Success Score, status, and the Publish button (disabled until hard checks pass).
+1. **Header:** product name, Opportunity Score, status, and the Publish button (disabled until hard checks pass).
 2. **Checklist panel:** hard and soft checks with pass/warn/fail and jump links to fix.
 3. **Artwork:** print asset with transparency proof and QA summary.
 4. **Mockups:** gallery in publish order with the primary flagged.
@@ -344,7 +344,7 @@ Single scrollable page, print-friendly.
 
 ### 3.14 `/listings` and `/listings/[listingId]`
 
-**Index:** DataTable of published listings — thumbnail · title · niche · published date · price · views · favourites · orders · revenue · conversion · days-to-first-sale · age-normalised percentile · predicted Design Success Score · prediction delta. Filter by niche, product type, concept origin, date range.
+**Index:** DataTable of published listings — thumbnail · title · niche · published date · price · views · favourites · orders · revenue · conversion · days-to-first-sale · age-normalised percentile · estimated Opportunity Score · prediction delta. Filter by niche, product type, concept origin, date range.
 
 **Detail:** performance time-series (views/favourites/orders/revenue with publish and edit markers) · predicted vs actual comparison · full lineage breadcrumb (run → gap/factor → concept → artwork → draft → listing), each element clickable · Etsy state and sync status · SEO used, with the option to A/B a different stored variation.
 

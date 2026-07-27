@@ -231,7 +231,7 @@ w_conf = { high: 1.0, medium: 0.7, low: 0.35 }
 w_size = minmax( ln(n) , ln(8) , ln(60) )
 ```
 
-This weight is what the Design Success Predictor consumes. A factor with lift 2.1×, n = 42, high confidence yields `weight ≈ 0.87` — matching the worked example in doc 5 §3.6.
+This weight is what the Opportunity Scoring Engine consumes. A factor with lift 2.1×, n = 42, high confidence yields `weight ≈ 0.87` — matching the worked example in doc 5 §3.6.
 
 ### 4.5 Anti-factor penalty weight
 
@@ -273,7 +273,7 @@ Without it, the engine's top recommendation is always a cell nobody has entered 
 
 ---
 
-## 6. Design Success Score (Step 7)
+## 6. Opportunity Score (Step 7)
 
 ```
 DesignSuccess = 0.30·MarketFit + 0.25·Conversion + 0.20·Opportunity

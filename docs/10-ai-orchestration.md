@@ -28,7 +28,7 @@
 | Success analysis | Optional narrative summary | **All statistics, lifts, significance, weights, statements** |
 | Failure analysis | Causality plausibility judgement (labelled as such) | All statistics |
 | Gap detection | Angle naming, explanation prose | Coverage matrix, demand estimation, gap scoring, ranking |
-| Design Success Predictor | None | **All five sub-scores** |
+| Opportunity Scoring Engine | None | **All five sub-scores** |
 | Concept generation | **Primary — the creative act** | Dedupe, embedding, quota enforcement |
 | Legal screening | Entity extraction, copyright risk classification | Registry lookup, blocklist match, **risk-level rule table** |
 | Artwork brief | **Primary — brief authoring** | Palette derivation, dimension calculation |

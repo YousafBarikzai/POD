@@ -64,7 +64,7 @@ Phase 1 builds exclusively for **P1**. Every P2–P4 need is accommodated *archi
 | JTBD-3 | *When I design, I want to know which visual choices correlate with sales in this specific niche, so my aesthetics are strategic.* | Success Analysis Engine (Step 4) |
 | JTBD-4 | *When I design, I want to know what reliably fails, so I stop repeating other people's mistakes.* | Failure Analysis Engine (Step 5) |
 | JTBD-5 | *When everyone is fighting over the same sub-niche, I want to find the one nobody has covered, so I can own it.* | Market Gap Engine (Step 6) |
-| JTBD-6 | *When I have an idea, I want a prediction of how it will perform before I spend money making it.* | Design Success Predictor (Step 7) |
+| JTBD-6 | *When I have an idea, I want a prediction of how it will perform before I spend money making it.* | Opportunity Scoring Engine (Step 7) |
 | JTBD-7 | *When I need ideas, I want original concepts derived from my market data — not generic AI slop.* | Concept Generator (Step 8) |
 | JTBD-8 | *When I create, I want to be certain I'm not infringing anyone's rights, so I never lose my shop.* | Legal & Safety Engine (Step 9) |
 | JTBD-9 | *When a concept is approved, I want production-ready artwork without a designer.* | Artwork Pipeline (Step 10) |
@@ -145,7 +145,7 @@ Multi-tenancy · Stripe subscriptions & metering · role-based access · public 
 
 ### 8.3 Creation
 - Concept board: 20 concepts (10 success-derived, 10 gap-derived) as cards with scores, reasoning, style tags; multi-select; regenerate individual or all; manual concept entry.
-- Design Success Predictor panel per concept with five sub-scores and reasoning.
+- Opportunity Scoring Engine panel per concept with five sub-scores and reasoning.
 - Legal & Safety screen: per-concept risk level, flagged terms, matched marks with registry links, suggested safer alternatives, mandatory acknowledgement for anything above Low.
 - Artwork Studio: brief viewer/editor, generation with variant count, side-by-side variant comparison, print-readiness QA panel (DPI, transparency, bleed, colour-count, edge quality), regenerate, upscale, background-remove, vectorise.
 
@@ -159,7 +159,7 @@ Multi-tenancy · Stripe subscriptions & metering · role-based access · public 
 
 ### 8.5 Analytics
 - Portfolio dashboard: published products, revenue, views, conversion, best/worst performers.
-- Prediction accuracy: predicted Design Success Score vs realised performance, with calibration curve.
+- Prediction accuracy: estimated Opportunity Score vs realised performance, with calibration curve.
 - Niche performance comparison.
 - Cost dashboard: spend per run, per product, per provider, month-to-date vs budget.
 - Learning panel: current scoring config version, what changed, effect on historical scores.

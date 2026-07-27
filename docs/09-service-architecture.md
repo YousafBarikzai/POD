@@ -218,7 +218,7 @@ Each engine is a package exporting one `execute(ctx)` function plus its pure hel
 **Process:** build coverage matrix (sub-niche × angle × style) → estimate demand per sub-niche → apply the demand floor → compute monetisability from observed price power → feasibility check → Gap Opportunity Score → rank → generate explanations and suggested angles → apply caution flags (trademark-heavy via the legal term list, seasonal-dead via the seasonality index, unprintable via a rules check).
 
 ### 5.6 Predictor Engine
-**Process:** assemble the feature vector for a concept (attributes × success factors × anti-factors × gap position × embedding distances) → compute five sub-scores deterministically → weighted Design Success Score → contribution vector → reasoning rendered from contributions.
+**Process:** assemble the feature vector for a concept (attributes × success factors × anti-factors × gap position × embedding distances) → compute five sub-scores deterministically → weighted Opportunity Score → contribution vector → reasoning rendered from contributions.
 **Model:** linear with expert priors initially; the fitted model (Phase 5) replaces the coefficient set but not the interface.
 
 ### 5.7 Concept Engine

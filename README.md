@@ -53,24 +53,25 @@ It contains **no application code** — implementation begins in Phase 2.
 
 ### 📙 [Phase 1C — AI Systems & External Integration Architecture](docs/PHASE-1C-ai-systems-and-integrations.md)
 
-**Read third.** How the system decides — the intelligence layer. Sixteen sections:
+**Read third.** How the system decides — the intelligence layer. Seventeen sections:
 
 | § | Section | Contents |
 |---|---|---|
 | 1–2 | AI Architecture & Claude Orchestration | Claude's eighteen defined jobs, what it never does, the 32-stage AI workflow, prompt anatomy, six consistency mechanisms |
-| 3 | EverBee Workflow | Four data routes ranked by reliability, with a default that requires no automated access to anyone's systems |
+| 3 | **Market Data Provider Layer** | Seven provider slots — Etsy API, CSV import, manual entry, EverBee export, extension, future, fixture. A normalised contract engines consume; no engine knows which provider supplied its data. |
 | 4 | Competitor Analysis | Shop selection scoring, the under-3-years preference, commercial and visual analysis, how observations become insight |
 | 5 | Success Analysis Engine | **The weighting system** — SEO 25% · colour 18% · pricing 15% · typography 12% · presentation 12% · layout 10% · product 8%, each argued |
 | 6 | Failure Analysis Engine | Causality labelling, ambiguity handling, crowded-loser detection, four channels feeding forward |
 | 7 | Market Gap Engine | Coverage matrix, competition measurement, the demand floor |
 | 8 | Design Generation | Two tracks, concept structure, computed risk levels, structural originality |
-| 9 | Ideogram Workflow | Brief/compile separation, evaluation pipeline, Visual Quality Score, variant selection |
-| 10 | Design Success Predictor | Six scores, with POD Suitability as a **multiplier and gate** rather than a weighted component |
+| 9 | Ideogram Workflow | Brief/compile separation, the **six-check Design Evaluation Gate**, remediation decision tree, variant selection |
+| 10 | Opportunity Scoring Engine | Binding **language policy** — estimates, never guarantees. Six scores, with POD Suitability as a **multiplier and gate**. |
 | 11 | SEO Engine | Sales-weighted keyword scoring, ten positioning axes, why competitive fit targets moderate not minimum |
 | 12 | Legal Checking | The risk rule table — the model assesses, the table decides |
 | 13–14 | Printify & Etsy | Product recommendation weighting, cost drift monitoring, eight-operation publishing |
-| 15 | Learning System | Four learning layers, nine guards, honest behaviour before data exists |
-| 16 | Reconciliation | Three refinements to Phase 1B, recorded explicitly |
+| 15 | Learning System | What real shop data unlocks — views, clicks, favourites, sales, conversion, **profit**. Four learning layers, nine guards, the value curve. |
+| 16 | **Version Roadmap** | V1 personal tool · V2 automation · V3 SaaS, with hard entry conditions and what must never be deferred |
+| 17 | Reconciliation | Seven refinements to Phase 1B, recorded explicitly |
 
 ---
 
@@ -90,7 +91,7 @@ Generates artwork            →  Print-ready, transparent, 300 DPI, validated
 Builds the product           →  Ranked configurations, real costs, enforced margin floor
 Writes the listings          →  10 differentiated SEO variations from measured keyword performance
 Publishes                    →  Printify + Etsy draft → human approval → live
-Tracks and learns            →  Real outcomes feed back and improve future predictions
+Tracks and learns            →  Real outcomes feed back and sharpen future estimates
 ```
 
 **The core idea:** every competitor tool owns one link in that chain. This product owns the chain — and the chain is where value compounds, because every published product feeds a growing dataset linking *design attributes → market conditions → realised sales*.

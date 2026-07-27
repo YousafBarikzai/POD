@@ -18,20 +18,21 @@
 |---|---|
 | 1 | [AI Architecture](#1--ai-architecture) |
 | 2 | [Claude Orchestration Design](#2--claude-orchestration-design) |
-| 3 | [EverBee Workflow](#3--everbee-workflow) |
+| 3 | [Market Data Provider Layer](#3--market-data-provider-layer) |
 | 4 | [Competitor Analysis System](#4--competitor-analysis-system) |
 | 5 | [Success Analysis Engine](#5--success-analysis-engine) |
 | 6 | [Failure Analysis Engine](#6--failure-analysis-engine) |
 | 7 | [Market Gap Engine](#7--market-gap-engine) |
 | 8 | [Design Generation System](#8--design-generation-system) |
 | 9 | [Ideogram Workflow](#9--ideogram-workflow) |
-| 10 | [Design Success Predictor](#10--design-success-predictor) |
+| 10 | [Opportunity Scoring Engine](#10--opportunity-scoring-engine) |
 | 11 | [SEO Generation Engine](#11--seo-generation-engine) |
 | 12 | [Legal Checking System](#12--legal-checking-system) |
 | 13 | [Printify Workflow](#13--printify-workflow) |
 | 14 | [Etsy Workflow](#14--etsy-workflow) |
 | 15 | [Learning System](#15--learning-system) |
-| 16 | [Reconciliation with Phase 1B](#16--reconciliation-with-phase-1b) |
+| 16 | [Version Roadmap](#16--version-roadmap) |
+| 17 | [Reconciliation with Phase 1B](#17--reconciliation-with-phase-1b) |
 
 ---
 
@@ -580,52 +581,169 @@ The imbalance is instructive: vision dominates cost despite being a minority of 
 
 ---
 
-# 3 — EverBee Workflow
+# 3 — Market Data Provider Layer
 
-## 3.1 The honest position, stated first
+## 3.1 The governing principle
 
-**EverBee does not publish a documented, generally available public interface.** It is a subscription product delivered as a web application and a browser extension.
+> **The system does not integrate with EverBee. The system integrates with a Market Data Provider Layer. EverBee is one provider inside it.**
 
-Its sales and revenue estimates are the highest-value single input to this product. It is also the input over which we have the least control.
+This distinction is architectural, not semantic. It means:
 
-**Therefore the governing architectural commitment:**
+| Consequence | Detail |
+|---|---|
+| No engine knows which provider supplied its data | Engines consume a single normalised shape |
+| Any provider can be added without touching an engine | New providers implement a mapping, nothing more |
+| Any provider can be removed without breaking the product | Capability detection adapts the pipeline |
+| No provider-specific format exists above the mapping layer | Provider shapes die at the boundary |
 
-> **The product must be fully functional — reduced in fidelity, not in capability — using only public marketplace data and files the operator exports themselves. Everything above that baseline is an enhancement, and every enhancement is gated by capability detection.**
+**The commitment that follows from this:**
 
-The user's instruction — *"the application must not depend on unreliable methods"* — is exactly right, and this section is built around it.
-
----
-
-## 3.2 The four data routes, ranked by reliability
-
-```
-                     ┌─────────────────────────────┐
-                     │   MARKET DATA SERVICE       │
-                     │   probes, resolves, merges  │
-                     └──────────────┬──────────────┘
-                                    │
-   ┌────────────┬───────────────────┼──────────────────┬────────────┐
-   ▼            ▼                   ▼                  ▼            ▼
-┌────────┐ ┌──────────┐      ┌────────────┐     ┌──────────┐ ┌─────────┐
-│ ROUTE  │ │  ROUTE   │      │   ROUTE    │     │  ROUTE   │ │ FIXTURE │
-│   A    │ │    B     │      │     C      │     │    D     │ │ (dev)   │
-│        │ │          │      │            │     │          │ │         │
-│ FILE   │ │ OFFICIAL │      │  BROWSER   │     │  PUBLIC  │ │         │
-│ EXPORT │ │   API    │      │ EXTENSION  │     │   ETSY   │ │         │
-│        │ │          │      │            │     │   API    │ │         │
-│ ██████ │ │  ██████  │      │   ████     │     │  ██████  │ │         │
-│ DEFAULT│ │ IF AVAIL │      │  OPT-IN    │     │  ALWAYS  │ │         │
-│ 🟢     │ │  🟢      │      │   🟠       │     │   🟢     │ │         │
-└────────┘ └──────────┘      └────────────┘     └──────────┘ └─────────┘
-   Cannot     May not          Requires            No sales
-   break      exist            consent             estimates
-```
+> **The product must be fully functional — reduced in fidelity, not in capability — using only public marketplace data and data the operator supplies themselves. Everything above that baseline is an enhancement, and every enhancement is gated by capability detection.**
 
 ---
 
-## 3.3 Route A — Operator file export **(the default)**
+## 3.2 The layer
 
-The operator uses EverBee's own export feature — a capability the product provides to its subscribers — and uploads the resulting file.
+```
+   ┌──────────────────────────────────────────────────────────────────┐
+   │                   ENGINES  (research · analysis · SEO)            │
+   │        consume ONLY the normalised market data contract           │
+   │        ★ no engine contains the word "EverBee" ★                  │
+   └────────────────────────────┬─────────────────────────────────────┘
+                                │  normalised records + provenance
+   ┌────────────────────────────▼─────────────────────────────────────┐
+   │              MARKET DATA PROVIDER LAYER                          │
+   │                                                                  │
+   │   probe capabilities  →  resolve provider chain                  │
+   │   →  fetch  →  MAP TO NORMALISED CONTRACT  →  validate           │
+   │   →  merge field-by-field  →  attach provenance                  │
+   │                                                                  │
+   │   ★ ALL provider-specific shapes are destroyed here ★            │
+   └───┬────────┬────────┬────────┬────────┬────────┬────────┬────────┘
+       │        │        │        │        │        │        │
+       ▼        ▼        ▼        ▼        ▼        ▼        ▼
+   ┌───────┐┌───────┐┌───────┐┌───────┐┌───────┐┌───────┐┌─────────┐
+   │EVERBEE││ ETSY  ││  CSV  ││MANUAL ││EVERBEE││ FUTURE││ FIXTURE │
+   │EXPORT ││  API  ││IMPORT ││ ENTRY ││EXTENS.││PROVID.││  (dev)  │
+   │       ││       ││(any   ││       ││       ││ eRank ││         │
+   │       ││       ││ tool) ││       ││       ││ Alura ││         │
+   │       ││       ││       ││       ││       ││ Sale  ││         │
+   │       ││       ││       ││       ││       ││ Samur.││         │
+   │  🟢   ││  🟢   ││  🟢   ││  🟢   ││  🟠   ││   ?   ││   n/a   │
+   │DEFAULT││ALWAYS ││ALWAYS ││ALWAYS ││OPT-IN ││ TBD   ││         │
+   └───────┘└───────┘└───────┘└───────┘└───────┘└───────┘└─────────┘
+```
+
+**Seven provider slots. None is required. At least two are always available.**
+
+---
+
+## 3.3 The normalised market data contract
+
+**This is the interface every provider maps into and every engine consumes.** It is the reason the layer works.
+
+### Normalised shop record
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `marketplace_shop_id` | identifier | Where known | Primary identity |
+| `shop_name` | text | **Yes** | Fallback identity |
+| `shop_url` | text | No | |
+| `opened_at` | date | No | Drives age calculations |
+| `location` | text | No | |
+| `total_sales` | count | No | |
+| `total_reviews` | count | No | |
+| `average_rating` | decimal | No | |
+| `active_listing_count` | count | No | |
+| `monthly_sales_estimate` | count | No | **Estimate — always flagged** |
+| `monthly_revenue` | money + currency | No | **Estimate — always flagged** |
+| `review_velocity_90d` | decimal | No | Derived if two observations exist |
+
+### Normalised listing record
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| `marketplace_listing_id` | identifier | Where known | Primary identity |
+| `title` | text | **Yes** | |
+| `shop_reference` | reference | **Yes** | Links to a shop record |
+| `url` | text | No | |
+| `product_type` | enum | No | Inferred if absent |
+| `listed_at` | date | No | Drives listing age |
+| `price` | money + currency | **Yes** | |
+| `shipping_cost` | money + currency | No | |
+| `free_shipping` | boolean | No | |
+| `image_count` | count | No | |
+| `image_urls` | text list | No | Drives visual analysis |
+| `tags` | text list | No | |
+| `materials` | text list | No | |
+| `description` | text | No | |
+| `review_count` | count | No | |
+| `average_rating` | decimal | No | |
+| `favourites` | count | No | |
+| `views` | count | No | Rarely available for competitors |
+| `monthly_sales_estimate` | count | No | **Estimate — always flagged** |
+| `total_sales_estimate` | count | No | **Estimate — always flagged** |
+| `monthly_revenue` | money + currency | No | **Estimate — always flagged** |
+| `is_bestseller` | boolean | No | |
+| `has_personalisation` | boolean | No | |
+| `section` | text | No | |
+
+### Normalised keyword record
+
+| Field | Type | Required |
+|---|---|---|
+| `term` | text | **Yes** |
+| `search_volume_estimate` | count | No |
+| `competition_estimate` | decimal | No |
+| `engagement_estimate` | decimal | No |
+
+### Provenance envelope — attached to every record and every field group
+
+| Field | Purpose |
+|---|---|
+| `provider_id` | Which provider supplied this |
+| `fetched_at` | When |
+| `is_estimate` | Measured or estimated |
+| `confidence` | low · medium · high |
+| `field_sources` | Per-field provider attribution after merge |
+| `method` | For derived values, the derivation used |
+
+### The three rules that make this contract work
+
+| # | Rule | Consequence if broken |
+|---|---|---|
+| **1** | **Only `title`, `shop_reference` and `price` are required on a listing** | A provider supplying only measured public data is a first-class provider, not a degraded one |
+| **2** | **Every estimated value carries `is_estimate` and `confidence`** | The interface can distinguish measured from estimated everywhere, which is a stated product principle |
+| **3** | **No provider-specific field survives the mapping** | An engine can never accidentally depend on a provider-specific quirk |
+
+---
+
+## 3.4 Provider capability declaration
+
+Each provider declares what it can supply. **The pipeline reads capabilities at run start and adapts** — this is what makes provider substitution safe.
+
+| Capability | EverBee export | Etsy API | CSV import | Manual entry | EverBee extension |
+|---|---|---|---|---|---|
+| Shop discovery | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Shop sales estimates | ✅ | ❌ | Depends | ✅ | ✅ |
+| Shop revenue estimates | ✅ | ❌ | Depends | ✅ | ✅ |
+| Listing metadata | ✅ | ✅ | Depends | ✅ | ✅ |
+| **Listing sales estimates** | ✅ | ❌ | Depends | ✅ | ✅ |
+| Listing revenue estimates | ✅ | ❌ | Depends | ✅ | ✅ |
+| Image URLs | ✅ | ✅ | Depends | ✅ | Partial |
+| Review counts | ✅ | ✅ | Depends | ✅ | ✅ |
+| Keyword volume | ✅ | ❌ | Depends | ✅ | ✅ |
+| Freshness | Export date | Live | File date | Entry date | Session |
+
+**Note the shape of this table.** No single provider covers everything, and the two always-available providers — Etsy API and CSV import — between them cover every field the differentiated analysis requires.
+
+---
+
+## 3.5 The provider catalogue
+
+### Provider 1 — EverBee export **(default when available)**
+
+The operator uses EverBee's own export feature and uploads the resulting file.
 
 **No automated access to anyone's systems occurs at any point.**
 
@@ -708,23 +826,82 @@ The operator uses EverBee's own export feature — a capability the product prov
 
 **The trade-off is honest:** it requires a manual step, and data is as fresh as the last export. The interface makes freshness visible and prompts for a refresh when data ages past a threshold.
 
----
-
-## 3.4 Route B — Official interface (if one exists)
-
-If EverBee offers a documented interface now or later — including through a partner or affiliate arrangement — it becomes a thin adapter following the standard contract: schema validation, retry, rate limiting, circuit breaking, cost recording, fixture-backed tests.
-
-**It is written to be trivially added. It is not assumed to exist.**
-
-### Recommended commercial action
-
-**Approach EverBee for interface or partner access before implementation of the market data layer begins**, and record the outcome in this document.
-
-The commercial argument is straightforward: this product drives usage of their data and creates a category of user who needs a subscription to get full value. A formal arrangement converts the highest-value input from conditional to guaranteed and eliminates the largest single risk in the architecture. It is worth pursuing on its own merits regardless of the technical outcome.
+**And the critical point:** this provider is the *default when present*, not a dependency. Remove it and the product still runs on Etsy API plus CSV import.
 
 ---
 
-## 3.5 Route C — Browser extension **(opt-in, off by default)**
+## 3.6 Provider 2 — Etsy API **(always available, no subscription required)**
+
+The marketplace's own documented interface. **Measured data, no estimates.**
+
+| Property | Detail |
+|---|---|
+| Availability | **Always.** Requires only the operator's own marketplace authorisation, which publishing needs anyway. |
+| Cost | None beyond rate limits |
+| Data quality | **Measured, not estimated** — the highest confidence in the system |
+| Reliability | Documented, versioned, stable |
+| Coverage | Everything except sales estimates, revenue estimates and keyword volume |
+
+**This provider is why the product can never be dead in the water.** It requires no third-party subscription, no file, no extension and no manual work. It is present from the moment the operator connects their shop.
+
+Its limitations and the derived proxies that compensate are covered in §3.9.
+
+---
+
+## 3.7 Provider 3 — CSV import **(always available, tool-agnostic)**
+
+A generic import accepting tabular data from **any** source, not only EverBee.
+
+| Aspect | Detail |
+|---|---|
+| Accepted sources | eRank · Alura · Sale Samurai · Marmalead · a spreadsheet the operator maintains · any tool that exports rows |
+| Format detection | Header signature matching against known layouts, falling back to guided mapping |
+| **Column mapping** | The operator maps columns to the normalised contract once per format signature; the mapping is remembered and reused |
+| Partial data | **Fully supported.** A file containing only shop names and monthly sales is a valid import. Missing fields are simply absent, not errors. |
+| Validation | Identical to the EverBee path — type, range, plausibility, cross-field |
+| Confidence | Declared by the operator at import time, defaulting to medium for estimates |
+
+### Why a generic import matters more than it appears
+
+| Reason | Detail |
+|---|---|
+| **Removes single-vendor dependency entirely** | If EverBee vanished tomorrow, the operator switches to any competing tool and imports its export. No code change. |
+| Supports tools we have never heard of | The mapping interface accommodates any tabular layout |
+| Supports the operator's own research | Hand-maintained spreadsheets are a legitimate and common source |
+| Supports future providers before adapters exist | A new tool can be used the day it launches, via export, without waiting for an integration |
+
+**This is the provider that makes the layer genuinely provider-agnostic**, rather than merely EverBee-plus-fallbacks.
+
+---
+
+## 3.8 Provider 4 — Manual data entry **(always available)**
+
+Direct entry of shop and listing records through the interface.
+
+| Use case | Why it matters |
+|---|---|
+| A shop the operator knows about that discovery missed | Local knowledge beats automated discovery in niche markets |
+| Correcting an obviously wrong estimate | The operator may know a figure is wrong from direct observation |
+| Adding data from a source with no export | Some tools display data they will not export |
+| Bootstrapping a niche with no other data | A minimum viable dataset can be entered by hand |
+| Recording competitive intelligence from outside any tool | Trade shows, forums, direct observation |
+
+### Design requirements
+
+| Requirement | Detail |
+|---|---|
+| Entry effort | A shop record requires only a name. A listing requires only a title, a shop and a price. Everything else is optional. |
+| Bulk entry | A tabular grid supporting paste from a spreadsheet, not a form per record |
+| **Provenance** | Manually entered data is marked as such, with the entering user and timestamp |
+| **Confidence** | The operator declares confidence per entry — this is not assumed to be high |
+| Editability | Manual records remain editable; automated records do not, since they are observations |
+| Merge behaviour | Manual entries participate in the standard field-level merge with their declared confidence |
+
+**Why this is a first-class provider rather than an afterthought.** It guarantees the system can never be completely blocked. Even with no subscription, no marketplace connection and no file, an operator can enter ten competitor listings by hand and get a real analysis. That is the floor beneath the floor.
+
+---
+
+## 3.9 Provider 5 — EverBee browser extension **(opt-in, off by default)**
 
 A browser extension the operator installs, which reads data the operator is already viewing in their own authenticated session and forwards it to the application.
 
@@ -754,7 +931,7 @@ A browser extension the operator installs, which reads data the operator is alre
 | Kill switch | Disable in one action; the system falls back without interruption |
 | **Detection evasion** | **Never implemented.** No fingerprint manipulation, no challenge solving, no address rotation. |
 
-**Enforced architecturally.** The adapter interface provides no capability for evasion, and a build-time check verifies no such logic exists anywhere in the codebase. If access requires evasion, the route reports itself unavailable — which is the correct engineering answer, not a limitation to work around.
+**Enforced architecturally.** The adapter interface provides no capability for evasion, and a build-time check verifies no such logic exists anywhere in the codebase. If access requires evasion, the provider reports itself unavailable — which is the correct engineering answer, not a limitation to work around.
 
 ### Limitations, stated plainly
 
@@ -763,14 +940,52 @@ A browser extension the operator installs, which reads data the operator is alre
 | Requires the operator to browse | Cannot gather data unattended |
 | Coverage is what they looked at | Incomplete by nature |
 | Depends on the target's page structure | Breaks when the target changes; must fail loudly, not silently mis-parse |
-| Requires maintenance | An ongoing cost that the file-export route does not carry |
+| Requires maintenance | An ongoing cost that the export and import providers do not carry |
 | Permissibility depends on the target's terms | Reviewed at every phase gate, with the review date recorded and displayed |
 
-**This route is a convenience layer over Route A, not a replacement for it.** If it stops working, nothing breaks.
+**This provider is a convenience layer, not a foundation.** If it stops working, nothing breaks.
 
 ---
 
-## 3.6 Route D — Public marketplace interface **(always available)**
+## 3.10 Provider 6 — Future providers
+
+The layer is designed for providers that do not yet exist or that we have not yet evaluated.
+
+| Candidate | Integration route |
+|---|---|
+| eRank, Alura, Sale Samurai, Marmalead | CSV import today; a dedicated adapter if a documented interface exists |
+| A future EverBee interface or partner arrangement | A thin adapter following the standard contract |
+| Marketplace-native analytics as they expand | Adapter |
+| Aggregated industry data services | Adapter |
+| A second marketplace's public interface | Adapter, when marketplace expansion happens |
+
+### What adding a provider requires
+
+```
+   ① declare capabilities
+   ② implement the mapping to the normalised contract
+   ③ implement fetch or import
+   ④ provide fixtures for testing
+   ⑤ record its compliance tier and consent requirement
+```
+
+**Nothing else.** No engine changes, no schema changes, no scoring changes. That is the test of whether the layer is genuinely modular, and it is the acceptance criterion for the implementation.
+
+### Commercial action — recorded here, unchanged in priority
+
+**Approach EverBee for interface or partner access before implementation of the market data layer begins**, and record the outcome. The commercial argument is that this product drives usage of their data and creates a category of user who needs a subscription to get full value.
+
+**But note what has changed with this refinement:** obtaining that arrangement is now an *optimisation*, not a *dependency*. If the answer is no, the layer runs on Etsy API, CSV import and manual entry, and the product works.
+
+---
+
+## 3.11 Provider 7 — Fixture provider **(development and testing)**
+
+Serves recorded data for local development, automated testing and demonstrations. Makes the entire pipeline runnable offline, free, deterministically.
+
+---
+
+## 3.12 Etsy API in detail **(the always-available foundation)**
 
 Provides **measured** data — but no sales or revenue estimates.
 
@@ -797,7 +1012,7 @@ All labelled as estimates with the method named and confidence set to low.
 
 **The review-to-sale ratio starts as a configured default and is calibrated per niche in the learning phase against the operator's own realised sales.** This converts a guess into a fitted proxy over time — one of the more valuable outputs of the learning system.
 
-### The critical observation about this route
+### The critical observation about this provider
 
 **The genuinely differentiated analysis does not depend on sales estimates.**
 
@@ -816,7 +1031,7 @@ The product remains substantially valuable in this mode. It says so, clearly, ra
 
 ---
 
-## 3.7 Capability-driven degradation
+## 3.13 Capability-driven degradation
 
 The pipeline reads available capabilities at run start and adapts. **The run never fails because a source is missing.**
 
@@ -830,16 +1045,16 @@ The pipeline reads available capabilities at run start and adapts. **The run nev
 
 ---
 
-## 3.8 Field-level merge
+## 3.14 Field-level merge
 
-Records from multiple routes describing the same entity are merged **field by field**, never row-replaced.
+Records from multiple providers describing the same entity are merged **field by field**, never row-replaced.
 
 ```
    PRECEDENCE
      1. Measured beats estimated
      2. Higher confidence beats lower
      3. Fresher beats staler
-     4. Configured route priority breaks ties
+     4. Configured provider priority breaks ties
 ```
 
 The winning source is recorded per field, enabling the interface to state honestly:
@@ -851,39 +1066,43 @@ The winning source is recorded per field, enabling the interface to state honest
 
 ---
 
-## 3.9 Legal considerations
+## 3.15 Legal considerations
 
-| Route | Tier | Basis | Consent | Default |
+| Provider | Tier | Basis | Consent | Default |
 |---|---|---|---|---|
-| A — File export | 🟢 Green | The operator uses their own subscription's own export feature. No automated access. | None needed | **Enabled** |
-| B — Official interface | 🟢 Green | Documented interface used under its terms | None needed | If available |
-| D — Public marketplace | 🟢 Green | Documented interface, authenticated, rate-limited, within terms | None needed | **Enabled** |
-| C — Browser extension | 🟠 Amber | Automated extraction from a third-party application using the operator's own session; permissibility depends on that vendor's terms | **Explicit, informed** | **Disabled** |
+| **Etsy API** | 🟢 Green | Documented interface, authenticated, rate-limited, within terms | None needed | **Enabled** |
+| **CSV import** | 🟢 Green | The operator supplies a file they already possess | None needed | **Enabled** |
+| **Manual entry** | 🟢 Green | The operator types what they know | None needed | **Enabled** |
+| EverBee export | 🟢 Green | The operator uses their own subscription's own export feature. No automated access. | None needed | Enabled when used |
+| Future provider interface | 🟢 Green | Documented interface used under its terms | None needed | If available |
+| EverBee browser extension | 🟠 Amber | Automated extraction from a third-party application using the operator's own session; permissibility depends on that vendor's terms | **Explicit, informed** | **Disabled** |
 | Anything requiring evasion | 🔴 Red | — | — | **Never built** |
+
+**Note the composition:** three green providers are enabled by default and require no third-party subscription of any kind. The single amber provider is optional, disabled, and removable without consequence.
 
 ### Standing rules
 
 1. **Vendor terms reviewed at every phase gate**, with the review date recorded and displayed in settings.
-2. **Amber routes require a consent screen** stating plainly that the operator, not the application, is the party bound by the vendor's terms.
-3. **No route may implement anti-detection behaviour.** If access is technically blocked, the route reports itself unavailable.
+2. **Amber providers require a consent screen** stating plainly that the operator, not the application, is the party bound by the vendor's terms.
+3. **No provider may implement anti-detection behaviour.** If access is technically blocked, the provider reports itself unavailable.
 4. **Only public commercial data is collected.** No personal data of buyers, reviewers or shop owners beyond a public shop name. Reviewer names and review text are never stored — only counts and velocities.
 5. **Competitor images are stored transiently** for statistical analysis, retained for a bounded period, **never used as generative input**, and never redistributed.
-6. **A single toggle disables all amber routes instantly.**
+6. **A single toggle disables all amber providers instantly.**
 
 ---
 
-## 3.10 Why this design satisfies "must not depend on unreliable methods"
+## 3.16 Why this design satisfies "must not depend on unreliable methods"
 
 | Requirement | How it is met |
 |---|---|
-| No dependency on an undocumented interface | The default route uses no interface at all |
-| No dependency on page structure remaining stable | The default route parses a file the vendor generated for this purpose |
+| No dependency on any single vendor | EverBee is one provider among seven; two are always available |
+| No dependency on page structure remaining stable | The default provider parses a file the vendor generated for this purpose |
 | No dependency on evasion | Structurally impossible — the capability does not exist in the codebase |
 | No silent degradation | Capability probing at run start; every limitation surfaced with its remedy |
 | No total failure | Public marketplace data always available; the run always completes |
-| No credential exposure | The application never holds third-party research-tool credentials on any route |
+| No credential exposure | The application never holds third-party research-tool credentials on any provider |
 
-**The test:** if every route except A and D were removed tomorrow, the product would continue producing opportunity reports, competitor analyses, visual style findings, failure analyses, market gaps, concepts, artwork and listings — with sales-derived conclusions labelled as lower confidence.
+**The test:** if every provider except Etsy API, CSV import and manual entry were removed tomorrow, the product would continue producing opportunity reports, competitor analyses, visual style findings, failure analyses, market gaps, concepts, artwork and listings — with sales-derived conclusions labelled as lower confidence.
 
 That is the definition of not depending on unreliable methods.
 
@@ -2119,7 +2338,7 @@ Each reports the measured value, the threshold, the status and **the specific re
 
 ## 9.6 The Visual Quality Score
 
-A deterministic composite feeding the Design Success Predictor.
+A deterministic composite feeding the Opportunity Scoring Engine.
 
 ```
    Visual Quality = 0.30 × thumbnail legibility
@@ -2138,6 +2357,217 @@ A deterministic composite feeding the Design Success Predictor.
 | **Edge quality** | Alpha transition sharpness, halo detection, stray-pixel count | Poor edges are the most visible print defect |
 
 **Thumbnail legibility being the highest-weighted component is a deliberate commercial judgement**, and one that separates this from a general aesthetic score. This is not measuring beauty; it is measuring whether the design does its commercial job.
+
+---
+
+## 9.6a The Design Evaluation Gate
+
+**No artwork reaches the operator without passing this gate.** Six checks, run in a fixed order chosen so the cheapest and most decisive run first.
+
+```
+   RENDERED ARTWORK (post-processing)
+        │
+        ▼
+   ① PRINT QUALITY          [deterministic]   ← blocking
+        │  resolution · transparency · stroke widths · text heights ·
+        │  colour count · gamut · edges · file size · aspect
+        ▼
+   ② TEXT ACCURACY          [Claude: vision]  ← blocking if text was specified
+        │  does the rendered text EXACTLY match the brief?
+        ▼
+   ③ VISUAL QUALITY         [deterministic]   ← threshold
+        │  thumbnail legibility · composition · palette execution · edges
+        ▼
+   ④ POD SUITABILITY        [deterministic]   ← blocking below floor
+        │  garment compatibility · ink coverage · format fit
+        ▼
+   ⑤ SIMILARITY & COPYRIGHT [deterministic + Claude: vision]  ← blocking
+        │  embedding distance vs competitors and own prior work
+        │  unintended logos · recognisable likenesses · protected marks
+        ▼
+   ⑥ MARKET ATTRIBUTE MATCH [deterministic]   ← threshold
+        │  does the render actually match the winning attributes?
+        ▼
+   REMEDIATION DECISION
+```
+
+---
+
+### Check 1 — Print quality *(blocking)*
+
+The criteria table in §9.5. Each reports measured value, threshold, status and remedy.
+
+**Blocking.** Artwork failing any hard criterion cannot be attached to a product, enforced at the service layer.
+
+---
+
+### Check 2 — Text accuracy *(blocking where text was specified)*
+
+**The check most systems omit, and the one that causes the most embarrassing failures.**
+
+Image models routinely misspell words, invent letters, drop characters, duplicate words, and produce plausible-looking text that is subtly wrong. A misspelled shirt reaching a customer is unrecoverable — it is a refund, a bad review, and a manual takedown.
+
+| Verified | Method |
+|---|---|
+| **Exact character match** to the brief's specified text | Vision model transcribes the rendered text; deterministic comparison against the brief string |
+| No invented words or characters | Any text present that is not in the brief is a failure |
+| No dropped or duplicated words | Sequence comparison |
+| Legibility at print size | Character height measurement |
+| Correct capitalisation and punctuation | Exact comparison |
+
+```
+   brief specifies text?
+        │
+        ├─ no ──► verify NO text was rendered
+        │          (models add text unprompted — this is also a failure)
+        │
+        └─ yes ─► transcribe → EXACT comparison
+                     │
+                     ├─ exact match ────► pass
+                     ├─ minor variance ─► fail, regenerate with same seed
+                     └─ garbled ────────► fail, regenerate with new seed
+```
+
+**Zero tolerance.** Not "close enough". A single wrong character fails the check. The cost of regeneration is pennies; the cost of a misspelled product is a customer complaint and a manual intervention.
+
+---
+
+### Check 3 — Visual quality *(threshold)*
+
+The composite from §9.6 — thumbnail legibility, print technical quality, composition, palette execution, edge quality.
+
+**Below the acceptance threshold, the variant is excluded from the ranked list** rather than blocked outright, since the operator may still prefer it over its siblings.
+
+---
+
+### Check 4 — POD suitability *(blocking below floor)*
+
+| Assessed | Detail |
+|---|---|
+| Garment compatibility | Contrast between artwork ink and each recommended garment colour |
+| Ink coverage | Cost and print-method implications of the coverage |
+| Colour practicality | Count, gamut compliance, screen-print viability |
+| Format fit | Aspect ratio and dimensional match to the print area |
+
+Below the floor, the artwork is **blocked from attachment to a product** with the failing criterion named.
+
+---
+
+### Check 5 — Similarity and copyright risk *(blocking)*
+
+Two components:
+
+| Component | Method |
+|---|---|
+| **Similarity** | Embedding distance against every competitor image analysed in the run, and against all prior workspace artwork |
+| **Copyright** | Vision review for unintended brand marks, recognisable characters, real-person likenesses and protected imagery the brief never requested |
+
+**The copyright component exists because a clean concept can produce risky artwork.** Image models generate logos on garments, faces resembling real people, and marks nobody asked for. Screening the concept is necessary but not sufficient — the render must be screened too.
+
+Findings feed the risk rule table in §12.4 and can escalate the artwork's risk level independently of its concept's.
+
+---
+
+### Check 6 — Market attribute match *(threshold)*
+
+**Does the finished artwork actually exhibit the attributes the research said work?**
+
+```
+   RE-ANALYSE the rendered artwork with the SAME visual analysis
+   pipeline used on competitor listings
+        │
+        ▼
+   compare extracted attributes against the brief and the findings
+        │
+        ▼
+   ┌──────────────────────────────────────────────────────────┐
+   │  Attribute      Brief        Rendered      Match          │
+   │  ────────────────────────────────────────────────────     │
+   │  Palette family muted_green  muted_green   ✅              │
+   │  Dominant hue   #4A6741      #4B6840       ✅ within tol.  │
+   │  Typography     vintage_serif vintage_serif ✅             │
+   │  Layout         badge_circle  centred_stack ⚠️ deviation   │
+   │  Complexity     moderate      detailed      ⚠️ deviation   │
+   │  Colour count   ≤ 6           9             ⚠️ deviation   │
+   └──────────────────────────────────────────────────────────┘
+        │
+        ▼
+   attribute match score → feeds Market Fit at artwork stage
+```
+
+**Why this check is genuinely important.** The entire product rests on generating designs that match measured success patterns. If the brief specifies a badge layout and the model renders a centred stack, the design no longer matches the finding that justified it — and its Market Fit score, which was computed at concept stage from the *intent*, is now wrong.
+
+**This check closes the loop between what was specified and what was produced.** Without it, the system could confidently score a design on attributes it does not actually have.
+
+Attributes are re-extracted using the identical pipeline applied to competitors, which means the comparison is like-for-like.
+
+---
+
+### The remediation decision
+
+Failures do not simply reject. They route to the cheapest effective fix.
+
+| Failure | Remediation | Cost |
+|---|---|---|
+| Resolution below target | **Upscale** | Negligible |
+| Transparency absent or poor | **Re-run background removal**, alternative method | Negligible |
+| Edge halo | **Decontamination pass** | Negligible |
+| Aspect mismatch | **Auto-crop** | Negligible |
+| Colour count excessive | **Palette quantisation** | Negligible |
+| Out-of-gamut colours | **Gamut mapping** | Negligible |
+| **Text inaccurate — minor** | **Regenerate, same seed, text emphasised in brief** | One generation |
+| **Text inaccurate — garbled** | **Regenerate, new seed, simplified text** | One generation |
+| Stroke widths too thin | **Regenerate with bolder line-weight brief** | One generation |
+| Attribute deviation on one attribute | **Regenerate with that attribute emphasised** | One generation |
+| Attribute deviation on several | **Revise the brief, then regenerate** | Brief + generation |
+| Similarity too high | **Regenerate with a differentiation instruction** | One generation |
+| Copyright finding | **Regenerate with an explicit exclusion**, or escalate to legal review | One generation |
+| Visual quality low, no specific cause | **Regenerate, new seed** | One generation |
+
+```
+   ANY FAILURE
+        │
+        ▼
+   is there a deterministic fix?  ──yes──► APPLY IT, re-check
+        │ no                                    │
+        ▼                                       ▼
+   is the cause diagnosable?                 passed? ──► done
+        │
+        ├─ yes ──► DIAGNOSTIC REGENERATION
+        │           brief automatically amended to address the
+        │           specific failure, then regenerate
+        │
+        └─ no ───► PLAIN REGENERATION with a new seed
+        │
+        ▼
+   automatic attempts exhausted?
+        │
+        ├─ no ──► retry
+        │
+        └─ yes ─► PRESENT TO OPERATOR with a diagnostic summary
+                    "All 4 variants failed minimum stroke width.
+                     The brief's line-weight specification appears
+                     too fine for this style. Suggested amendment: …"
+```
+
+**Diagnostic regeneration is the important behaviour.** If all four variants fail the same criterion, the system does not blindly retry — it amends the brief to address the cause and regenerates. The failure informs the next attempt rather than being repeated.
+
+**Automatic attempts are capped**, because each costs real money. Beyond the cap, the operator decides, with a specific diagnosis rather than a generic failure.
+
+---
+
+### Gate summary
+
+| Check | Type | Severity | Model involved |
+|---|---|---|---|
+| 1 · Print quality | Measured | **Blocking** | No |
+| 2 · Text accuracy | Transcribe + compare | **Blocking** | Yes — transcription only |
+| 3 · Visual quality | Measured | Threshold | No |
+| 4 · POD suitability | Measured | **Blocking below floor** | No |
+| 5 · Similarity & copyright | Measured + vision | **Blocking** | Yes — safety review only |
+| 6 · Market attribute match | Measured | Threshold | Yes — same classifier as competitors |
+
+**Four of six checks involve no model at all. The two that do use it only to observe, never to judge.** Every pass/fail decision is deterministic.
 
 ---
 
@@ -2196,11 +2626,59 @@ A deterministic composite feeding the Design Success Predictor.
 
 ---
 
-# 10 — Design Success Predictor
+# 10 — Opportunity Scoring Engine
+
+## 10.0 Language policy — binding on every surface
+
+**The system produces evidence-based estimates. It does not predict guaranteed results.** The language must say so, everywhere, without exception.
+
+| ❌ Never use | ✅ Use instead |
+|---|---|
+| Success prediction | Opportunity estimate |
+| Success score | **Estimated Potential** · **Opportunity Score** |
+| Will sell · will perform · will succeed | Estimated potential · evidence suggests |
+| Predicted revenue | Estimated potential based on comparable listings |
+| Guaranteed · proven to work | Associated with · correlated with · observed in |
+| This design will convert at X% | Comparable listings in this niche converted at X% |
+| High success probability | Strong alignment with observed success factors |
+| The AI predicts | The evidence indicates |
+
+### The rules
+
+| # | Rule |
+|---|---|
+| **1** | Every score is labelled as an **estimate** in its presentation, not merely in a footnote |
+| **2** | Every score displays its **confidence level** alongside the number |
+| **3** | Every score is **traceable to the evidence** that produced it |
+| **4** | Score bands describe **alignment with evidence**, not likelihood of outcome |
+| **5** | Where the system has been wrong before, the calibration view **shows it** |
+| **6** | Below the evidence threshold, the system **declines to score** rather than producing a weak number |
+
+### Why this is a hard requirement, not a style preference
+
+Three reasons, in ascending order of importance:
+
+1. **It is accurate.** The system estimates alignment between a design and observed market patterns. That is a genuinely useful thing, and it is not a prediction of sales.
+2. **It is commercially safer.** A product that promises outcomes it cannot deliver generates disappointment proportional to the confidence of its claims.
+3. **It is self-consistent.** The product ships a calibration view that will sometimes show the estimates were wrong. Language claiming prediction would be contradicted by the product's own analytics — which is a far worse failure than modest language.
+
+### Band descriptions under this policy
+
+| Range | Band | What it means — stated correctly |
+|---|---|---|
+| 0–39 | Weak | **Poor alignment** with the evidence from this niche |
+| 40–59 | Moderate | **Partial alignment**, with significant gaps |
+| 60–74 | Promising | **Good alignment** across most dimensions |
+| 75–87 | Strong | **Strong alignment** across dimensions |
+| 88–100 | Exceptional | **Strong alignment on every dimension simultaneously** — rare |
+
+Note that every description is about **alignment with evidence**, never about likelihood of sales. The operator draws the commercial inference themselves, which is correct — they have context the system does not.
+
+---
 
 ## 10.1 The six scores
 
-Every design receives six scores before publication. **Five are components; the sixth is the composite.**
+Every design receives six scores before publication. **Five are components; the sixth is the composite estimate.**
 
 | Score | Question it answers |
 |---|---|
@@ -2209,7 +2687,7 @@ Every design receives six scores before publication. **Five are components; the 
 | **Competition** | How crowded is the space this occupies? |
 | **Visual Quality** | Is this well-executed as a piece of design? |
 | **POD Suitability** | Will this actually print and sell as a physical product? |
-| **Estimated Success** | **The composite prediction** |
+| **Estimated Potential** | **The composite estimate** |
 
 > **Reconciliation with Phase 1B.** Phase 1B specified a five-dimension model: Market Fit, Originality, Conversion, Competition, Opportunity. **Phase 1C supersedes it** with the six-score model specified here. The mapping: *Conversion* is decomposed into the more directly measurable *Visual Quality* and *POD Suitability*; *Opportunity* becomes a component of *Market Fit*, since a design's positioning against gaps is a form of market alignment. This is a genuine improvement — the new dimensions are measurable from the artwork itself rather than inferred, which makes them both more reliable and more explainable.
 
@@ -2331,7 +2809,7 @@ The deterministic composite defined in §9.6 — thumbnail legibility, print tec
 POD Suitability is **not** added to a weighted sum. It **multiplies** the result.
 
 ```
-   Estimated Success = ( 0.40 × Market Fit
+   Estimated Potential = ( 0.40 × Market Fit
                        + 0.25 × Visual Quality
                        + 0.20 × (100 − Competition)
                        + 0.15 × Originality )
@@ -2415,7 +2893,7 @@ A multiplier makes suitability behave the way it behaves in reality: as a gate.
 ```
    LAYER 1 — THE ANSWER
    ┌──────────────────────────────────────────┐
-   │   ESTIMATED SUCCESS       74 / 100       │
+   │   ESTIMATED POTENTIAL      74 / 100       │
    │   ████████████████░░░░    PROMISING      │
    │   Confidence: Medium                     │
    └──────────────────────────────────────────┘
@@ -2458,7 +2936,7 @@ A multiplier makes suitability behave the way it behaves in reality: as a gate.
 
 | Requirement | Reason |
 |---|---|
-| **Never state or imply certainty.** The label is "Estimated Success", never "Will Sell". | The system predicts; it does not know |
+| **Never state or imply certainty.** The label is "Estimated Potential", never "Will Sell" or "Success Score". | The system estimates from evidence; it does not know |
 | **Always show the confidence level** | A 74 from thin evidence is not a 74 from strong evidence |
 | **Always link to the underlying evidence** | A score the operator cannot interrogate is a score they should not trust |
 | **Show accuracy honestly once outcomes exist** | The calibration view exists precisely to reveal where predictions were wrong |
@@ -3231,17 +3709,64 @@ That dataset is impossible to buy, compounds with use, and is the entire moat.
 
 ---
 
-## 15.3 What is tracked
+## 15.3 What is tracked — and why real shop data changes everything
 
-| Category | Signals |
+**The architecture below works from day one. Its usefulness is a direct function of how much real shop data exists.**
+
+This is worth stating plainly because it sets honest expectations: on day one the system uses expert-set weights and market-research findings. It becomes materially more powerful once the operator's **own** shop data accumulates — because that data answers questions market research cannot.
+
+### The signals, and what each unlocks
+
+| Signal | Source | What it unlocks that research alone cannot |
+|---|---|---|
+| **Views** | Marketplace, own shop | Whether a listing is failing on **discoverability** or on **conversion** — the single most important diagnostic distinction, and one competitor data cannot provide |
+| **Clicks / visits** | Marketplace stats, own shop | Search-result performance separate from listing-page performance. Reveals whether the **thumbnail and title** are working. |
+| **Favourites** | Marketplace, own shop | Purchase intent without purchase — an early signal available long before sales, and the fastest-moving indicator on a new listing |
+| **Sales** | Marketplace orders, own shop | The outcome variable. Realised demand, not estimated. |
+| **Conversion rate** | Derived: orders ÷ views | **The cleanest quality measure available.** Isolates listing quality from traffic volume entirely. |
+| **Profit** | Derived: revenue − real costs − real fees | **The variable that actually matters.** A design selling well at thin margin is worse than one selling moderately at healthy margin — and no competitor tool can see this because nobody publishes their costs. |
+| **Days to first sale** | Derived | Time-to-traction, per attribute profile |
+| **Sales trajectory** | Time series | Whether performance builds, plateaus or decays |
+| **Lifecycle events** | Marketplace | State changes, deactivations, edits, price changes — the confounders that must be controlled for |
+
+### The four things only real shop data can answer
+
+```
+   ┌─────────────────────────────────────────────────────────────┐
+   │  ① IS IT A TRAFFIC PROBLEM OR A CONVERSION PROBLEM?         │
+   │     views low, conversion fine    → SEO failure              │
+   │     views fine, conversion low    → design or price failure  │
+   │     ★ competitor data CANNOT distinguish these ★             │
+   ├─────────────────────────────────────────────────────────────┤
+   │  ② WHICH ATTRIBUTES ACTUALLY PREDICT — FOR THIS OPERATOR?   │
+   │     market research says muted greens lift 2.1×              │
+   │     the operator's own sales say 1.9× — validated            │
+   │     or say 0.9× — the research finding did not transfer      │
+   ├─────────────────────────────────────────────────────────────┤
+   │  ③ WHICH STRATEGY WORKS — SUCCESS-DERIVED OR GAP-DERIVED?   │
+   │     concept origin is recorded through to realised sales     │
+   │     ★ no other tool can answer this at all ★                 │
+   ├─────────────────────────────────────────────────────────────┤
+   │  ④ WHAT IS ACTUALLY PROFITABLE, NOT MERELY POPULAR?         │
+   │     real costs + real fees + real orders = real margin       │
+   │     ★ the only place true unit economics become visible ★    │
+   └─────────────────────────────────────────────────────────────┘
+```
+
+### The value curve
+
+| Data available | What the system can do |
 |---|---|
-| **Sales results** | Orders, revenue, days to first sale, sales trajectory |
-| **Views** | Total, per day, and the trajectory over the listing's life |
-| **Conversion** | Orders ÷ views, compared to the niche baseline |
-| **Engagement** | Favourites, favourites per view |
-| **Best performers** | Top-quartile listings and their full attribute profile |
-| **Poor performers** | Bottom-quartile listings and their full attribute profile |
-| **Lifecycle** | State changes, deactivations, edits, price changes |
+| **None — day one** | Expert weights. Market-research findings only. Estimates uncalibrated. **The interface says so.** |
+| **Views + favourites** *(days)* | Distinguish discoverability failures from conversion failures. Earliest actionable signal. |
+| **+ First sales** *(weeks)* | Time-to-traction by attribute profile. Early validation of findings. |
+| **+ Conversion rates** *(1–2 months)* | Listing quality isolated from traffic. Compare designs fairly regardless of how much traffic each received. |
+| **+ Profit data** *(1–2 months)* | True unit economics. Shift from optimising for sales to optimising for **profit**. |
+| **+ 50 outcomes** *(3–6 months)* | **Weight recalibration begins.** First fitted proposal. |
+| **+ 200 outcomes** *(6–12 months)* | Weights substantially data-driven. Niche-specific proxy calibration. Reliable factor validation. |
+| **+ 500 outcomes** *(12 months+)* | Interaction effects become detectable. Attribute-level confidence approaches research-grade. |
+
+**The architecture does not change across this curve. Only the confidence in its outputs does** — and the interface reports that confidence honestly at every stage.
 
 ### The target variable
 
@@ -3282,7 +3807,7 @@ The percentages from §5.4 — SEO 25%, colour 18%, pricing 15%, and so on. Thes
 
 ### Layer 2 — Composite weights
 
-The Estimated Success weighting — Market Fit 40%, Visual Quality 25%, Competition 20%, Originality 15%. Refitted to maximise correlation with realised outcomes.
+The Estimated Potential weighting — Market Fit 40%, Visual Quality 25%, Competition 20%, Originality 15%. Refitted to maximise correlation with realised outcomes.
 
 ### Layer 3 — Proxy calibration
 
@@ -3399,15 +3924,226 @@ No pretence of learning. No vague "the AI is improving". A specific number, a sp
 
 ---
 
-# 16 — Reconciliation with Phase 1B
+# 16 — Version Roadmap
+
+## 16.1 The governing rule
+
+> **Get a working personal product first. Everything else is a distraction until that exists and is genuinely used.**
+
+Three versions, each with a **hard entry condition**. A version does not begin because the previous one is "mostly done" — it begins because the previous one is demonstrably working in daily use.
+
+```
+   V1 — PERSONAL TOOL          V2 — AUTOMATION          V3 — SaaS PLATFORM
+   ─────────────────           ──────────────           ──────────────────
+   One user. One shop.         Same user. Less          Multiple users.
+   The full loop, working.     manual effort.           Subscriptions. Teams.
+
+   ENTRY: now                  ENTRY: V1 used daily     ENTRY: V2 proven +
+                               for one month, 30+       value articulable in
+                               products published       one sentence someone
+                                                        would pay for
+```
+
+---
+
+## 16.2 Version 1 — Personal Tool
+
+**Goal:** the complete loop — niche in, published product out, outcomes tracked — working for one person.
+
+**The test:** *would the creator choose this over their current process every day?* If not, V1 is not finished, regardless of feature count.
+
+### In V1 — the complete intelligence loop
+
+| Area | Included |
+|---|---|
+| **Market data** | Etsy API · CSV import · manual entry · EverBee export. **No browser extension.** |
+| **Research** | Sub-niche discovery · opportunity scoring · seasonality · shop selection with the fallback ladder · full listing collection |
+| **Visual analysis** | Colour measurement · typography, layout, mockup, subject classification · embeddings · content-hash caching |
+| **Analysis engines** | Success · failure · market gap — **complete, with full statistical rigour** |
+| **Concepts** | 20 concepts (10 success-derived, 10 gap-derived) with citations and risk levels |
+| **Scoring** | All six scores with contribution vectors and confidence levels |
+| **Legal** | **Complete. Non-negotiable.** Entity extraction, registries, rule table, blocking gate, safer alternatives |
+| **Artwork** | Brief authoring · Ideogram generation · full processing pipeline · **the complete six-check evaluation gate** |
+| **Commerce** | Product recommendation · real-cost pricing with margin floor · 10 SEO variations |
+| **Publishing** | Printify build · Etsy draft · final review · human-approved publish |
+| **Tracking** | Daily performance sync · views, favourites, orders, revenue · lineage · cost tracking |
+| **Learning** | **Recording infrastructure complete.** Outcome records built from day one. Fitting disabled until the threshold. |
+
+### Explicitly excluded from V1
+
+| Excluded | Reason |
+|---|---|
+| Multi-user, teams, roles | One user. Building for a second serves nobody. |
+| Subscriptions, billing | Nothing to sell until the product is proven |
+| Browser extension | A convenience layer. Four data providers already work. |
+| Active weight recalibration | Requires ~50 outcomes — 3 to 6 months of real use |
+| Bulk publishing | Encourages the volume strategy this product replaces |
+| Additional marketplaces | Etsy's mechanics are baked into the analysis |
+| Public API | No consumer exists |
+| Mobile | A data-dense desktop analysis tool |
+| Automatic anything irreversible | Never — a permanent principle, not a deferral |
+
+### Why the legal engine and the evaluation gate are in V1
+
+Both are tempting to defer. Both must not be.
+
+| Component | Why it cannot wait |
+|---|---|
+| **Legal engine** | It guards against the only risk that can end the business. Retrofitting a blocking gate into a system that already generates artwork is far harder than building it in, because every existing call path must be audited. |
+| **Design evaluation gate** | Without it, the operator manually inspects every render for misspellings, print faults and attribute drift — which is precisely the manual work V1 exists to eliminate. A generation pipeline without an evaluation gate is not automation; it is a slower way to make the same mistakes. |
+
+### V1 exit criteria
+
+- [ ] A real niche produces all four reports within the latency and cost budgets
+- [ ] Every finding shows cohort support, market baseline, lift, sample size and confidence
+- [ ] A run completes with reduced scope when any single provider is disabled
+- [ ] Twenty distinct concepts generated, every citation resolving correctly
+- [ ] A blocked concept **cannot** produce artwork — verified at the service layer
+- [ ] Artwork passes all six evaluation checks, including exact text accuracy
+- [ ] A product publishes end to end to a live listing
+- [ ] Induced failures during publishing produce **zero duplicates**
+- [ ] Performance data flows back; any listing traces fully to its research
+- [ ] **The creator prefers it to their previous process**
+
+---
+
+## 16.3 Version 2 — Automation Improvements
+
+**Entry condition:** V1 in daily use for one month, 30+ products published through it.
+
+**Goal:** same operator, materially less manual effort, materially better decisions.
+
+### V2.1 — Close the learning loop *(the highest-value work in V2)*
+
+| Feature | Value |
+|---|---|
+| **Active weight recalibration** | The system's core model becomes fitted to this operator's realised outcomes rather than expert priors |
+| **Factor validation reporting** | Which research findings actually predicted, and which did not |
+| **Proxy calibration** | Review-to-sale ratio fitted per niche from real sales, materially improving the Etsy-API-only path |
+| **Concept-origin analysis** | Whether success-derived or gap-derived designs perform better **for this operator** |
+| **Profit-based optimisation** | Shift the target from sales volume to realised profit |
+
+**This is first in V2 because it is the compounding asset.** Every month of delay is a month of outcome data not being converted into better decisions.
+
+### V2.2 — Reduce manual effort
+
+| Feature | Effort saved |
+|---|---|
+| Browser extension for market data | Removes the manual export step |
+| Scheduled niche re-research with change alerts | Removes periodic manual re-runs |
+| Batch operations with per-item review | Removes repetitive approval clicking without removing approval |
+| Draft review queue | Enables batched approval sessions |
+| Automatic cost-drift repricing | Removes manual margin monitoring |
+| Saved run templates | Removes repeated wizard configuration |
+
+### V2.3 — Improve decision quality
+
+| Feature | Value |
+|---|---|
+| **SEO A/B testing on live listings** | Nine unused variations per product already exist. Testing them converts stored data into measured knowledge. |
+| Run comparison over time | Which competitors entered, which factors shifted, whether opportunity moved |
+| Portfolio-wide margin monitoring | Catch silent erosion across all listings |
+| Order-level cost reconciliation | Stop *modelling* margin, start *measuring* it |
+| Interaction-effect detection at scale | Becomes statistically viable with more outcomes |
+| Seasonal planning view | Publish timed to seasonality peaks with correct lead time |
+
+### V2 exit criteria
+
+- [ ] At least one weight recalibration proposed, back-tested and activated
+- [ ] Estimated scores demonstrate measurable correlation with realised outcomes
+- [ ] Operator time per published product materially below V1
+- [ ] Profit per published listing measurably above the pre-system baseline
+- [ ] The value is articulable in one sentence a stranger would pay for
+
+---
+
+## 16.4 Version 3 — SaaS Platform
+
+**Entry condition:** V2 proven, and the value articulable in one sentence a stranger would pay for.
+
+**Do not start V3 before this.** Building billing, teams and metering before the product is proven is the most reliable way to spend months on infrastructure for something nobody wants.
+
+### V3.1 — Multi-tenancy
+
+Already architected — every table carries a workspace identifier from the first migration, isolation policies are written and tested, credentials are per-workspace encrypted.
+
+| Work | Detail |
+|---|---|
+| Enable isolation enforcement | Switch the database role; policies already exist |
+| Invitations and roles | Enforce the permission matrix already defined |
+| Per-workspace provider credentials | Structurally supported; this is a user-experience change |
+| Fair scheduling | Per-workspace queue partitioning so one tenant cannot starve others |
+
+### V3.2 — Commercial
+
+| Component | Notes |
+|---|---|
+| Subscription billing | **With usage components.** Every run and artwork costs real money; a flat unlimited plan is how products with per-unit costs go bankrupt. |
+| Usage metering | Cost is already tracked per call and attributed per workspace — **no new instrumentation needed** |
+| Plan entitlements | Slot into the existing budget-guard middleware |
+| Onboarding for non-technical users | V1 assumes someone who can generate an API token. Real customers cannot. |
+| Guided provider setup | The market data question is subtle and needs an opinionated, forgiving flow |
+
+### V3.3 — Platform intelligence
+
+| Feature | Value |
+|---|---|
+| **Shared market-fact caching** | Two workspaces researching the same niche should not both pay to analyse the same images. **Roughly doubles gross margin at scale.** Enabled by content-hash keying already in place. |
+| Cross-account benchmarking | *"Your opportunity score of 68 is in the top 30% of gardening niches researched here."* Only a multi-user product can offer this. |
+| Public API | Agency workflows and integrations |
+| Shareable and white-label reports | Agency requirement |
+
+### V3 exit criteria
+
+- [ ] Complete tenant isolation verified by an automated cross-workspace suite
+- [ ] Subscription lifecycle working end to end
+- [ ] Usage metering accurate against actual costs
+- [ ] A second user onboards without assistance
+- [ ] Unit economics positive per active workspace
+- [ ] First paying customer
+
+---
+
+## 16.5 Summary
+
+| | V1 — Personal | V2 — Automation | V3 — SaaS |
+|---|---|---|---|
+| **Users** | 1 | 1 | Many |
+| **Goal** | The loop works | The loop improves itself | The loop sells |
+| **Market data** | 4 providers | + extension | + per-tenant, shared caching |
+| **Learning** | Recording only | **Active** | Cross-account |
+| **Legal engine** | **Complete** | Refined | Same |
+| **Evaluation gate** | **Complete** | Refined | Same |
+| **Publishing** | Single, approved | Batched, approved | Same |
+| **Billing** | None | None | Full |
+| **Entry condition** | Now | 1 month use, 30+ products | Value articulable and proven |
+
+### The three things that must not be deferred
+
+| Not deferrable | Why |
+|---|---|
+| **The legal engine** | Guards the only risk that can end the business, and is far harder to retrofit |
+| **The design evaluation gate** | Without it there is no automation, only faster mistakes |
+| **Learning-loop recording** | Outcome data cannot be recovered retrospectively. Every month not recorded is a month of the compounding asset permanently lost. |
+
+**The third is the one most often missed.** The *fitting* can wait until V2. The *recording* cannot — an outcome that was never captured is gone forever, and the outcome dataset is the entire moat.
+
+---
+
+# 17 — Reconciliation with Phase 1B
 
 Phase 1C refines three things specified in Phase 1B. Recorded explicitly so the documents do not silently disagree.
 
 | Item | Phase 1B | Phase 1C | Reason |
 |---|---|---|---|
-| **Prediction dimensions** | Five: Market Fit, Originality, Conversion, Competition, Opportunity | **Six: Market Fit, Originality, Competition, Visual Quality, POD Suitability, Estimated Success** | *Conversion* was inferred and hard to measure; it decomposes into *Visual Quality* and *POD Suitability*, both measurable directly from the artwork. *Opportunity* becomes a component of Market Fit, where it belongs conceptually. |
+| **Prediction dimensions** | Five: Market Fit, Originality, Conversion, Competition, Opportunity | **Six: Market Fit, Originality, Competition, Visual Quality, POD Suitability, Estimated Potential** | *Conversion* was inferred and hard to measure; it decomposes into *Visual Quality* and *POD Suitability*, both measurable directly from the artwork. *Opportunity* becomes a component of Market Fit, where it belongs conceptually. |
 | **POD Suitability treatment** | Would have been a weighted component | **A multiplier and a hard gate** | An unprintable design is worth zero regardless of other scores. An additive model would rate it respectably, which is wrong. |
-| **Market data route C** | Described as an assisted server-side session | **A browser extension** | Better on every dimension: the application never holds third-party credentials, the rate is human-paced by construction, and the operator sees exactly what is captured. |
+| **Market data acquisition** | Described as an assisted server-side session | **A browser extension** | Better on every dimension: the application never holds third-party credentials, the rate is human-paced by construction, and the operator sees exactly what is captured. |
+
+| **Market data structure** | EverBee-centred with fallbacks | **A provider layer with seven slots; EverBee is one** | Removes single-vendor dependency entirely. Three green providers are enabled by default and require no third-party subscription. |
+| **Score naming** | "Design Success Score", "Estimated Success" | **"Opportunity Score", "Estimated Potential"** | The system produces evidence-based estimates, not predictions of guaranteed results. The language must say so — and the product's own calibration view would contradict stronger claims. |
+| **Artwork evaluation** | Validation checks listed individually | **A consolidated six-check Design Evaluation Gate with a remediation decision tree** | Adds text accuracy and market attribute match, which were absent and are the two most consequential omissions. |
+| **Versioning** | Roadmap lived in a separate document | **V1 / V2 / V3 with hard entry conditions, in §16** | Keeps the intelligence design and its delivery sequence in one place. |
 
 Everything else in Phase 1B stands unchanged.
 
@@ -3436,7 +4172,7 @@ Everything else in Phase 1B stands unchanged.
 
 | # | Question | Blocks |
 |---|---|---|
-| 1 | Is an official or partner data arrangement obtainable from the research-tool vendor? | Market data route priority — **highest impact** |
+| 1 | Is an official or partner data arrangement obtainable from the research-tool vendor? | Market data provider priority — **high impact, no longer blocking** |
 | 2 | Minimum sample size and significance thresholds for finding suppression | Success and failure engines |
 | 3 | Which registries and goods classes constitute adequate legal coverage; default risk appetite | Legal engine |
 | 4 | Exact print dimensions, resolutions and placement rules per product type | Artwork validation |

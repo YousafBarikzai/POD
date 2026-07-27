@@ -282,7 +282,7 @@ sequenceDiagram
 
 ## 11. W11 — Final Review & Publish (human gate 3)
 
-**Screen contents:** concept summary · artwork with transparency proof · mockup gallery · product configuration and variants · pricing table · itemised profit estimate · selected SEO in an Etsy-like preview · legal status · Design Success Score · pre-publish checklist.
+**Screen contents:** concept summary · artwork with transparency proof · mockup gallery · product configuration and variants · pricing table · itemised profit estimate · selected SEO in an Etsy-like preview · legal status · Opportunity Score · pre-publish checklist.
 
 **Checklist (publish disabled until all hard items pass):**
 

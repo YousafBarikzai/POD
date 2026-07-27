@@ -61,13 +61,14 @@
 | **Opportunity Score** | 0–100 composite of Demand, Competition (inverted), Trend, Profitability and Seasonality. Answers "is this niche worth entering?" |
 | **Verdict band** | `avoid` / `marginal` / `good` / `strong` / `exceptional`, mapped from the Opportunity Score. |
 | **Gap Opportunity Score** | 0–100 per coverage cell from demand, inverse supply, monetisability and feasibility. |
-| **Design Success Score** | 0–100 composite of Market Fit, Conversion, Opportunity, Originality and Competition (inverted). Answers "will this specific design work?" |
+| **Design Opportunity Score** | 0–100 composite of Market Fit, Visual Quality, Competition (inverted), Originality, multiplied by POD Suitability. Answers "what is this specific design's estimated potential?" — an evidence-based estimate, never a guarantee. |
 | **Market Fit** | Weighted alignment of a concept's attributes with success factors, minus alignment with anti-factors. |
 | **Originality** | `1 − max similarity` to competitor listings/images and to the workspace's own prior work. |
 | **Conversion** | Modelled purchase propensity from attributes empirically linked to conversion. Expert-weighted initially, fitted from outcomes later. |
 | **Contribution vector** | The itemised, signed point contributions producing a score. The UI's reasoning display renders this — it is never free-form model narrative. |
 | **Shrinkage** | Blending fitted weights toward expert priors in proportion to sample size (`λ = n/(n+150)`). Prevents small samples from rewriting the model. |
-| **Calibration** | How well predicted scores match realised outcomes. Measured by Spearman ρ, Brier score and Precision@10. |
+| **Calibration** | How well estimated scores match realised outcomes. Measured by rank correlation, Brier score and precision at the top. |
+| **Estimated Potential** | The composite design score. Deliberately named to signal an evidence-based estimate rather than a prediction of guaranteed results. |
 
 ---
 
