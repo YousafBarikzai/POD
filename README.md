@@ -51,6 +51,27 @@ It deliberately contains **no database design, no API design and no technology c
 
 It contains **no application code** — implementation begins in Phase 2.
 
+### 📙 [Phase 1C — AI Systems & External Integration Architecture](docs/PHASE-1C-ai-systems-and-integrations.md)
+
+**Read third.** How the system decides — the intelligence layer. Sixteen sections:
+
+| § | Section | Contents |
+|---|---|---|
+| 1–2 | AI Architecture & Claude Orchestration | Claude's eighteen defined jobs, what it never does, the 32-stage AI workflow, prompt anatomy, six consistency mechanisms |
+| 3 | EverBee Workflow | Four data routes ranked by reliability, with a default that requires no automated access to anyone's systems |
+| 4 | Competitor Analysis | Shop selection scoring, the under-3-years preference, commercial and visual analysis, how observations become insight |
+| 5 | Success Analysis Engine | **The weighting system** — SEO 25% · colour 18% · pricing 15% · typography 12% · presentation 12% · layout 10% · product 8%, each argued |
+| 6 | Failure Analysis Engine | Causality labelling, ambiguity handling, crowded-loser detection, four channels feeding forward |
+| 7 | Market Gap Engine | Coverage matrix, competition measurement, the demand floor |
+| 8 | Design Generation | Two tracks, concept structure, computed risk levels, structural originality |
+| 9 | Ideogram Workflow | Brief/compile separation, evaluation pipeline, Visual Quality Score, variant selection |
+| 10 | Design Success Predictor | Six scores, with POD Suitability as a **multiplier and gate** rather than a weighted component |
+| 11 | SEO Engine | Sales-weighted keyword scoring, ten positioning axes, why competitive fit targets moderate not minimum |
+| 12 | Legal Checking | The risk rule table — the model assesses, the table decides |
+| 13–14 | Printify & Etsy | Product recommendation weighting, cost drift monitoring, eight-operation publishing |
+| 15 | Learning System | Four learning layers, nine guards, honest behaviour before data exists |
+| 16 | Reconciliation | Three refinements to Phase 1B, recorded explicitly |
+
 ---
 
 ## What the product does
@@ -143,7 +164,8 @@ The `docs/` directory also contains earlier and more granular technical drafts. 
 
 | Phase | Title | Status |
 |---|---|---|
-| **1** | **Product Definition** | ✅ **Complete — ready for review** |
+| **1A** | **Product Definition** | ✅ **Complete — ready for review** |
 | **1B** | **Technical Architecture** | ✅ **Complete — ready for review** |
+| **1C** | **AI Systems & Integrations** | ✅ **Complete — ready for review** |
 | 2 | Implementation — foundation and orchestration | Not started |
 | 3 | Implementation — intelligence, creative, commerce, feedback | Not started |
