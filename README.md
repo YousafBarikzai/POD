@@ -8,9 +8,11 @@
 
 ## Start here
 
+Two completed specification documents, read in order.
+
 ### 📘 [Part 1 — Product Definition](docs/PART-1-product-definition.md)
 
-**This is the current deliverable and the document to read first.** It is a complete product requirements document covering:
+**Read first.** A complete product requirements document covering:
 
 1. Executive Summary
 2. Product Vision
@@ -26,7 +28,28 @@
 12. Product Differentiation
 13. Success Metrics
 
-It deliberately contains **no database design, no API design and no technology choices** — those belong to later parts.
+It deliberately contains **no database design, no API design and no technology choices** — those belong to Phase 1B.
+
+### 📗 [Phase 1B — Technical Architecture](docs/PHASE-1B-technical-architecture.md)
+
+**Read second.** How the software will be built. Twelve parts:
+
+| Part | Section | Contents |
+|---|---|---|
+| A | System Architecture | Frontend, backend, database, AI, integration, storage, auth, background processing and deployment tiers — and how every part communicates |
+| B | Technology Decisions | Every choice with what was rejected and why, grounded in this product's specific demands |
+| C | Database Design | ~35 tables with fields, keys, relationships and the reasoning behind each structural decision |
+| D | API Design | Every endpoint group with purpose, inputs, outputs and security requirements |
+| E | Backend Services | Thirteen services with responsibilities and enforced boundaries |
+| F | AI Architecture | Capability tiers, prompt registry, output contracts, injection defence, cost engineering, evaluation gates |
+| G | Integration Architecture | Adapter contract, the market-data provider chain, marketplace, fulfilment, registries |
+| H | Background Job System | Queues, job and step states, error classification, retry policy, crash recovery |
+| I | Security Architecture | Credential protection, authentication, authorisation, encryption, rate limiting, file security |
+| J | Scalability Architecture | Four growth stages, what actually breaks first, multi-user path, isolation, subscription preparation |
+| K | Project Structure | Monorepo layout with machine-enforced dependency boundaries |
+| L | Deployment Architecture | Environments, pipeline, migrations, monitoring, logging, backups, runbooks |
+
+It contains **no application code** — implementation begins in Phase 2.
 
 ---
 
@@ -76,12 +99,12 @@ Tracks and learns            →  Real outcomes feed back and improve future pre
 
 ---
 
-## Later-phase working drafts
+## Supporting working drafts
 
-The `docs/` directory also contains early technical drafts prepared ahead of Part 2. **These are not part of the current deliverable and are subject to change once Part 1 is signed off.** They are retained because the thinking is useful, not because it is agreed.
+The `docs/` directory also contains earlier and more granular technical drafts. **Phase 1B is the authoritative technical specification**; these supplement it with additional detail in specific areas (notably the scoring formulas in Appendix A and the prompt catalogue in Appendix B) and are retained as working material.
 
 <details>
-<summary>Show later-phase drafts</summary>
+<summary>Show supporting drafts</summary>
 
 | Document | Contents |
 |---|---|
@@ -118,9 +141,9 @@ The `docs/` directory also contains early technical drafts prepared ahead of Par
 
 ## Document series
 
-| Part | Title | Status |
+| Phase | Title | Status |
 |---|---|---|
 | **1** | **Product Definition** | ✅ **Complete — ready for review** |
-| 2 | System Architecture & Data Design | Draft material exists |
-| 3 | API & Integration Design | Draft material exists |
-| 4 | Implementation Plan | Draft material exists |
+| **1B** | **Technical Architecture** | ✅ **Complete — ready for review** |
+| 2 | Implementation — foundation and orchestration | Not started |
+| 3 | Implementation — intelligence, creative, commerce, feedback | Not started |
