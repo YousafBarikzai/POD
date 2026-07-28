@@ -73,12 +73,26 @@ It contains **no application code** — implementation begins in Phase 2.
 | 16 | **Version Roadmap** | V1 personal tool · V2 automation · V3 SaaS, with hard entry conditions and what must never be deferred |
 | 17 | Reconciliation | Seven refinements to Phase 1B, recorded explicitly |
 
-### 📕 [Phase 1D — Implementation Plan](docs/PHASE-1D-implementation-plan.md)
+### 📕 [Phase 1D — Master Implementation Roadmap](docs/PHASE-1D-implementation-plan.md)
 
-**Read fourth.** How the design becomes working software — the build plan for **V1, the personal tool**.
+**Read fourth.** The definitive development roadmap from architecture to working product. Execution-focused.
 
 | § | Section | Contents |
 |---|---|---|
+| 1 | **Development Strategy** | V1 Personal MVP · V2 Advanced Automation · V3 SaaS Platform, each with hard entry conditions |
+| 2 | Milestone Roadmap | Eleven milestones, each with goal, rationale, features, components, dependencies, effort, completion criteria, risks and **what not to build yet** |
+| 3 | **Milestone 0 — Validation** | Three niches, 150+ listings each, blind review with planted false controls, seven pass/fail criteria, and what changes if it fails |
+| 4 | Critical Path Analysis | Why the order is correct · highest-value milestone · biggest technical and business risks · the most common way this fails |
+| 5 | AI Build Strategy | Gateway first · prompt management · the eighteen jobs · deterministic scoring build order · error handling · three human gates |
+| 6 | Data & Market Intelligence | Build order with Etsy API first, not EverBee · the modularity acceptance test |
+| 7 | Design Generation | Brief → Ideogram → six-check gate · SVG workflow · transparency · regeneration decision tree |
+| 8 | Product Creation | Recommendation weighting · pricing rules · Printify · eight-operation publishing · approval workflow |
+| 9 | UI/UX Dependencies | ~22 screens by milestone · six user flows · dashboard requirements · what the operator must see at each stage |
+| 10 | Timeline | Aggressive 14 weeks · **Realistic 20** · Conservative 30 · capability by point in time |
+| 11 | Development Rules | Prioritise · avoid · non-negotiables · ordered cut list |
+| 12 | **Executive Summary** | What to build first · what to ignore · what creates most value · biggest risk · what determines success |
+
+---|---|---|
 | 1–2 | Build philosophy & dependency graph | Five sequencing principles, what can parallelise, the critical path |
 | 3 | Milestone overview | Eleven milestones, 21.5 weeks, with demos |
 | 4 | **Milestone 0 — Thesis validation** | One week, no production code, proving the analysis produces non-obvious findings **before** building the machine |

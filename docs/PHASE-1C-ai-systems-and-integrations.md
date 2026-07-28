@@ -3926,6 +3926,8 @@ No pretence of learning. No vague "the AI is improving". A specific number, a sp
 
 # 16 — Version Roadmap
 
+> **Superseded in detail by [Phase 1D §1](PHASE-1D-implementation-plan.md#1--development-strategy)**, which is the authoritative version strategy and build plan. This section is retained as the summary that informed it; where the two differ, 1D governs.
+
 ## 16.1 The governing rule
 
 > **Get a working personal product first. Everything else is a distraction until that exists and is genuinely used.**
