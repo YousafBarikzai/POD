@@ -1,0 +1,3 @@
+listing_ref,niche,shop_name,listing_title,listing_url,price,currency,shipping_cost,free_shipping,image_count,review_count,shop_total_sales,shop_opened_year,listing_age_months,is_bestseller,description_length,has_personalisation,screenshot_ref,screenshot_position,est_monthly_sales,est_total_sales,est_monthly_revenue,favourites,views,NOTES
+N1-001,Gardening,ExampleGardenCo,Vintage Allotment Life Gardening T-Shirt,https://www.etsy.com/listing/1234567890/example,22.95,GBP,0,Y,9,347,4820,2021,18,Y,medium,N,N1-shot-01,1,,,,,,EXAMPLE ROW - DELETE BEFORE SENDING
+N1-002,Gardening,ExampleGardenCo,Plant Lady Funny Gardening Tee,https://www.etsy.com/listing/1234567891/example,19.50,GBP,3.95,N,4,28,4820,2021,7,N,short,N,N1-shot-01,2,,,,,,EXAMPLE ROW - DELETE BEFORE SENDING
