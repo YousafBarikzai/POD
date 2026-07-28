@@ -8,7 +8,7 @@
 
 ## Start here
 
-Two completed specification documents, read in order.
+Four completed specification documents, read in order.
 
 ### 📘 [Part 1 — Product Definition](docs/PART-1-product-definition.md)
 
@@ -91,18 +91,6 @@ It contains **no application code** — implementation begins in Phase 2.
 | 10 | Timeline | Aggressive 14 weeks · **Realistic 20** · Conservative 30 · capability by point in time |
 | 11 | Development Rules | Prioritise · avoid · non-negotiables · ordered cut list |
 | 12 | **Executive Summary** | What to build first · what to ignore · what creates most value · biggest risk · what determines success |
-
----|---|---|
-| 1–2 | Build philosophy & dependency graph | Five sequencing principles, what can parallelise, the critical path |
-| 3 | Milestone overview | Eleven milestones, 21.5 weeks, with demos |
-| 4 | **Milestone 0 — Thesis validation** | One week, no production code, proving the analysis produces non-obvious findings **before** building the machine |
-| 5 | Milestone 1 — Walking skeleton | Every architectural seam exercised, all providers faked, offline and free |
-| 6–8 | Data, visual analysis, **analysis engines** | The core value, with a checkpoint that re-runs the M0 test at production quality |
-| 9–11 | Concepts, legal gate, artwork | Including the service-layer bypass test and the induced-misspelling test |
-| 12–14 | Commerce, publishing, tracking | Including zero-duplicate chaos testing |
-| 15–16 | Local setup & testing gates | One command to a working system with realistic data |
-| 17 | Estimates | 106–146 person-days; 27.5 weeks with buffer |
-| 18 | Risk register | Early warning signals, four go/no-go checkpoints, what to cut and what never to cut |
 
 ---
 
